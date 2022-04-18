@@ -1,18 +1,49 @@
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, Text, View } from 'react-native'
-import Home from './components/Home'
+
+import Create from './components/Create'
+import Select from './components/Select'
+import CreateInstance from './components/CreateInstance'
+import Used from './components/Used'
+import Waste from './components/Waste'
+
+import Tabs from './components/TabNavigator'
+
 import Contants from 'expo-constants'
 
-export default function App() {
+import { createStackNavigator } from '@react-navigation/stack'
+import { NavigationContainer } from '@react-navigation/native'
 
-  const test = "this is a test"
+const Stack = createStackNavigator()
+
+function HomeStack(){
+  return(
+    <Tabs/>
+  )
+}
+
+function App() {
 
   return (
     <View style={styles.container}>
-      <Home test = {test}/>
-      <StatusBar style="auto" />
+      <Stack.Navigator>
+        <Stack.Screen name ="Home" options={{title: "Items"}} component={HomeStack}/>
+        <Stack.Screen name ="Create" options={{title: "Add New Food"}} component={Create}/>
+        <Stack.Screen name ="Select" options={{title: "Select Food Type"}} component={Select}/>
+        <Stack.Screen name ="Used" options={{title: "Enter Amount Used"}} component={Used}/>
+        <Stack.Screen name ="CreateInstance" options={{title: "Add New Food"}} component={CreateInstance}/>
+        <Stack.Screen name ="Waste" options={{title: "Waste Data"}} component={Waste}/>
+      </Stack.Navigator>
     </View>
   );
+}
+
+export default() => {
+  return(
+    <NavigationContainer>
+      <App/>
+    </NavigationContainer>
+  )
 }
 
 const styles = StyleSheet.create({

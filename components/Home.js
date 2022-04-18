@@ -1,19 +1,67 @@
 
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import {View, Text, FlatList, StyleSheet} from 'react-native'
-import { Card, FAB } from 'react-native-paper'
+import { Card, FAB, Button, List, BottomNavigation } from 'react-native-paper'
 
 function Home(props) {
 
-    const data = [
-        {id: 1, name: 'apple'}
-    ]
+    const [data, setData] = useState([])    
+
+    useEffect(() => {
+        fetch('http://10.9.184.224:5000/getInstance',{
+            method:'GET'
+        })
+        .then(resp => resp.json())
+        .then(instance => {
+            console.log(instance)
+            setData(instance)
+        })
+    }, [])
+
+    const setUsed = () => {
+        fetch("http://10.9.184.224:5000/addUsed", {
+        method:'POST',
+        headers: {
+          'Content-Type':'application/json'
+        },
+        body: JSON.stringify({food_id:food_id, price:price, amount:amount, month:month, day:day, year:year})
+      })
+      .then(resp => resp.json())
+      .then(data => {
+        props.navigation.push('Home')
+      })
+      .catch(error => console.log(error))
+    }
+
+    const pickMonth = (num) => {
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        return months[num-1]
+    }
+
+    const toTitleCase = (str) => {
+        return str.replace(/\w\S*/g, function(txt){
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    }
 
     const renderData = (item) => {
         return (
-            <Card style={styles.cardStyle}>
-                <Text>{item.name}</Text>
-            </Card>
+                <List.Accordion
+                title={`${toTitleCase(item.food.name)}`}
+                >
+                    <List.Item title={`     Quantity: ${item.amount}`}/>
+                    <List.Item title={`     Expiring: ${item.day} ${pickMonth(item.month)} ${item.year}`}/>
+                    <Button
+                    mode="contained"
+                    icon="check"
+                    onPress={() => props.navigation.navigate("Used", {
+                        item:item
+                    })}
+                    >
+                        Did you use this item?
+                    </Button>
+                
+                </List.Accordion>
         )
     }
 
@@ -24,7 +72,7 @@ function Home(props) {
         renderItem = {({item}) => {
             return renderData(item)
         }}
-        keyExtractor = {item => `${item.id}`}
+        keyExtractor = {item => `${item.instance_id}`}
         />
 
         <FAB
@@ -32,7 +80,7 @@ function Home(props) {
         small={false}
         icon="plus"
         theme={{colors:{accent:"green"}}}
-        onPress = {() => console.log("Pressed")}
+        onPress = {() => props.navigation.navigate('Select')}
         />
     </View>
   )
@@ -45,7 +93,7 @@ const styles = StyleSheet.create({
     },
     fab: {
         position:'absolute',
-        margin:16,
+        margin:20,
         right:0,
         bottom:0,
     }
