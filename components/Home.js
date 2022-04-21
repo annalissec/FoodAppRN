@@ -13,7 +13,6 @@ function Home(props) {
         })
         .then(resp => resp.json())
         .then(instance => {
-            console.log(instance)
             setData(instance)
         })
     }, [])
