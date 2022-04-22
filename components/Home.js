@@ -14,6 +14,7 @@ function Home(props) {
         .then(resp => resp.json())
         .then(instance => {
             setData(instance)
+            console.log(data)
         })
     }, [])
 
@@ -41,6 +42,13 @@ function Home(props) {
         return str.replace(/\w\S*/g, function(txt){
             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
         });
+    }
+
+    const sortData = (data) => {
+        for (var obj of data ) {
+            
+
+        }
     }
 
     const renderData = (item) => {
