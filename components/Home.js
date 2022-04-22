@@ -5,7 +5,9 @@ import { Card, FAB, Button, List, BottomNavigation } from 'react-native-paper'
 
 function Home(props) {
 
-    const [data, setData] = useState([])    
+    const [data, setData] = useState([]) 
+    const [sortedData, setSortedData] = useState([])  
+    const [expiredData, setExpiredData] = useState([]) 
 
     useEffect(() => {
         fetch('http://10.9.184.224:5000/getInstance',{
@@ -14,24 +16,9 @@ function Home(props) {
         .then(resp => resp.json())
         .then(instance => {
             setData(instance)
-            console.log(data)
+            console.log(sortedData)
         })
     }, [])
-
-    const setUsed = () => {
-        fetch("http://10.9.184.224:5000/addUsed", {
-        method:'POST',
-        headers: {
-          'Content-Type':'application/json'
-        },
-        body: JSON.stringify({food_id:food_id, price:price, amount:amount, month:month, day:day, year:year})
-      })
-      .then(resp => resp.json())
-      .then(data => {
-        props.navigation.push('Home')
-      })
-      .catch(error => console.log(error))
-    }
 
     const pickMonth = (num) => {
         var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -45,10 +32,20 @@ function Home(props) {
     }
 
     const sortData = (data) => {
+        var temp = []
+        var expired = []
+        let today = new Date().toISOString().slice(0, 10)
         for (var obj of data ) {
-            
-
+            if (obj.date != null && today <= obj.date) {
+                temp.push(obj)
+            } else {
+                expired.push(obj)
+            }
         }
+        temp.sort(function(a, b) {return new Date(a.date) - new Date(b.date)})
+        expired.sort(function(a, b) {return -1*(new Date(a.date) - new Date(b.date))})
+        setExpiredData(expired)
+        setSortedData(temp)
     }
 
     const renderData = (item) => {
@@ -74,13 +71,29 @@ function Home(props) {
 
   return (
     <View style={{flex:1}}>
+        <Text>Not Expired</Text>
         <FlatList
-        data = {data}
+        data = {sortedData}
+        extraData = {sortedData}
         renderItem = {({item}) => {
             return renderData(item)
         }}
         keyExtractor = {item => `${item.instance_id}`}
         />
+        <Text>Expired</Text>
+        <FlatList
+        data = {expiredData}
+        extraData = {expiredData}
+        renderItem = {({item}) => {
+            return renderData(item)
+        }}
+        keyExtractor = {item => `${item.instance_id}`}
+        />
+        <Button
+        onPress={() => sortData(data)}
+        >
+            Test
+            </Button>
 
         <FAB
         style={styles.fab}
