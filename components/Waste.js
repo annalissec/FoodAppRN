@@ -9,6 +9,7 @@ export default function Waste(props) {
 	const screenWidth = Dimensions.get("window").width;
 
 	const [data, setData] = useState([])
+	const [instance, setInstance] = useState([])
 
 	const chartConfig = {
 		backgroundGradientFrom: "#1E2923",
@@ -28,6 +29,16 @@ export default function Waste(props) {
     .then(resp => resp.json())
     .then(waste => {
         setData(waste)
+    })
+}, [])
+
+useEffect(() => {
+    fetch('http://10.9.184.224:5000/getInstance',{
+        method:'GET'
+    })
+    .then(resp => resp.json())
+    .then(instance => {
+        setInstance(instance)
     })
 }, [])
 
@@ -96,14 +107,14 @@ export default function Waste(props) {
 	{
 	  name: 'Money Wasted',
 	  cost: wasteCost,
-	  color: "#F00",
+	  color: "rgba(131, 167, 234, 1)",
 	  legendFontColor: "#7F7F7F",
 	  legendFontSize: 12
 	},
 	{
 	  name: 'Money Used',
 	  cost: usedCost,
-	  color: "rgba(131, 167, 234, 1)",
+	  color: "#F00",
 	  legendFontColor: "#7F7F7F",
 	  legendFontSize: 12		  
 	}
