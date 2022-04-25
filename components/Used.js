@@ -1,5 +1,6 @@
-import { View, Text } from 'react-native'
-import { Button, TextInput, HelperText } from 'react-native-paper'
+import { View, Text, StyleSheet } from 'react-native'
+import { Button, Card, HelperText } from 'react-native-paper'
+import { FakeCurrencyInput } from 'react-native-currency-input'
 import React, {useState} from 'react'
 
 export default function Used(props) {
@@ -25,25 +26,45 @@ export default function Used(props) {
         })
         .catch(error => console.log(error))
       }
-      const hasNumErrors = (item) => {
-        let isFloat = /^\d*\.?\d+$/.test(item)
-        let isNum = /^\d*$/.test(item)
-        return !isNum && !isFloat
+      const hasNumErrors = (price) => {
+        return price > item.amount
     }
+
+    const toTitleCase = (str) => {
+      return str.replace(/\w\S*/g, function(txt){
+          return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      });
+  } 
   
 
   return (
     <View>
-      <Text>{item.food.name}</Text>
-        <Text>Total Amount: {item.amount}</Text>
-      <TextInput
-      label="Amount Used"
-      value={amount_used}
-      onChangeText={onChangeAmt}
-      keyboardType='numeric'
+              <Card style={styles.cardStyle}>
+      <Text style={styles.text}>
+        Food: {toTitleCase(item.food.name)}
+      </Text>
+    </Card>
+    <Card style={styles.cardStyle}>
+      <Text style={styles.text}>
+        Total Amount: {item.amount}
+      </Text>
+    </Card>
+        <Card style={styles.inputCardStyle}>
+    <FakeCurrencyInput
+    style={styles.text}
+        value={amount_used ? amount_used : 0}
+        onChangeValue={(amount_used)=> {
+          setAmt(amount_used)
+          console.log(amount_used)
+        }}
+        prefix='Amount: '
+        delimiter=''
+        separator=""
+        precision={0}
       />
+    </Card>
       <HelperText type='error' visible= {hasNumErrors(amount_used)}>
-          please enter only number values
+          please enter number less than or equal to total amount
       </HelperText>
       <Button
       mode='contained'
@@ -53,3 +74,20 @@ export default function Used(props) {
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  cardStyle: {
+    margin:10,
+    padding:12,
+    marginBottom: 29
+  },
+  inputCardStyle: {
+    margin:10,
+    padding:10,
+    marginBottom: 0,
+    marginTop:2
+  },
+  text: {
+    fontSize:15
+  }
+});

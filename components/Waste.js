@@ -1,4 +1,4 @@
-import { Text, Dimensions, SafeAreaView  } from 'react-native'
+import { Dimensions, SafeAreaView  } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { PieChart } from 'react-native-chart-kit'
 
@@ -88,7 +88,7 @@ useEffect(() => {
 		pricePer = (parseFloat(obj.instance.price) / obj.instance.amount) * wasteAmt
 		sum += pricePer
 	}
-	return sum
+	return parseFloat(sum.toFixed(2))
   }
 
   
@@ -97,24 +97,24 @@ useEffect(() => {
     	for (var obj of data) {
 			sum += parseFloat(obj.instance.price)
 	  	}
-	  return sum
+	return parseFloat(sum.toFixed(2))
   }
 
-  var usedCost = wCost(data)
-  var wasteCost = tCost(data) - usedCost
+  var wasteCost = wCost(data)
+  var usedCost = parseFloat((tCost(data) - wasteCost).toFixed(2))
 
   const dataCost = [
 	{
 	  name: 'Money Wasted',
 	  cost: wasteCost,
-	  color: "rgba(131, 167, 234, 1)",
+	  color: "#F00",
 	  legendFontColor: "#7F7F7F",
 	  legendFontSize: 12
 	},
 	{
 	  name: 'Money Used',
 	  cost: usedCost,
-	  color: "#F00",
+	  color: "rgba(131, 167, 234, 1)",
 	  legendFontColor: "#7F7F7F",
 	  legendFontSize: 12		  
 	}

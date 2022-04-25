@@ -1,9 +1,11 @@
 
 import React, {useState, useEffect} from 'react'
 import {View, Text, FlatList, StyleSheet} from 'react-native'
-import { Card, FAB, Button, List } from 'react-native-paper'
+import { FAB, Button, List, Checkbox } from 'react-native-paper'
 
 function Home(props) {
+
+    const [checked, setChecked] = React.useState(false);
 
     const [data, setData] = useState([]) 
     
@@ -132,15 +134,29 @@ function Home(props) {
         }}
         keyExtractor = {item => `${item.instance_id}`}
         />
-
+    <View  style={styles.checkboxContainer}>
     <Text style={styles.headline}>
         History
     </Text>
-        <FlatList
+    <Checkbox
+    status={checked ? 'checked' : 'unchecked'}
+    onPress={() => {
+        console.log(!checked)
+        setChecked(!checked)
+    }}
+    />
+    <Text >
+        Hide History
+    </Text>
+    </View>
+
+    <FlatList
         data = {history}
         extraData = {history}
         renderItem = {({item}) => {
-            return renderHistory(item)
+            if (!checked){
+                return renderHistory(item)
+            }
         }}
         keyExtractor = {item => `${item.instance.instance_id}`}
         />
@@ -173,7 +189,11 @@ const styles = StyleSheet.create({
         padding:10,
         fontSize: 20,
         width: 200,
-      }
+      },
+    checkboxContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+      },
   });
 
 export default Home

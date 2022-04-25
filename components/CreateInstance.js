@@ -1,5 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native'
-import { Button, HelperText, TextInput } from 'react-native-paper'
+import { Button, Card, HelperText, TextInput } from 'react-native-paper'
+import DateTimePicker from '@react-native-community/datetimepicker'
+import FakeCurrencyInput from 'react-native-currency-input'
 import React, { useState } from 'react'
 
 export default function CreateInstance(props) {
@@ -10,12 +12,14 @@ export default function CreateInstance(props) {
     const [day, setDay] = useState('')
     const [month, setMon] = useState('')
     const [year, setYr] = useState('')
+    const [show, setShow] = useState(false)
 
     const onChangeAmt = text => setAmt(text)
     const onChangePrc = text => setPrc(text)
-    const onChangeDay = text => setDay(text)
-    const onChangeMon = text => setMon(text)
-    const onChangeYr = text => setYr(text)
+    
+    const showDate = () => {
+      setShow(true)
+    }
 
     const insertData = () => {
       fetch("http://10.9.184.224:5000/addInstance", {
@@ -43,55 +47,92 @@ export default function CreateInstance(props) {
         error = !(result == -1)
     }
 
+    const onChange = (event, dateEntry) => {
+      setShow(false)
+      expDate = new Date(dateEntry || new Date())
+      console.log(expDate)
+      setDay(expDate.getDate())
+      setMon(expDate.getMonth()+1)
+      setYr(expDate.getFullYear())
+    }
+
+    const pickMonth = (num) => {
+      var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      return months[num-1]
+  }
+
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, function(txt){
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+} 
+
   return (
     <View>
-        <Text>
-            {foodName} {food_id}
-        </Text>
-        <TextInput
-        label="Amount"
-        keyboardType='numeric'
-        value={amount}
-        onChangeText={onChangeAmt}
+        <Card style={styles.cardStyle}>
+      <Text style={styles.text}>
+        Food: {toTitleCase(foodName)}
+      </Text>
+    </Card>
+    <Card style={styles.inputCardStyle}>
+    <FakeCurrencyInput
+    style={styles.text}
+        value={amount ? amount : 0}
+        onChangeValue={(amount)=> {
+          setAmt(amount)
+          console.log(amount)
+        }}
+        prefix='Amount: '
+        delimiter=''
+        separator=""
+        precision={0}
       />
+    </Card>
       <HelperText type='error' visible= {hasNumErrors(amount)}>
           please enter only number values
       </HelperText>
-      <TextInput
+      <Card style={styles.inputCardStyle}>
+      <FakeCurrencyInput
+      style={styles.text}
+        value={price ? price : 0}
+        onChangeValue={(price) => {
+          setPrc(price)
+          console.log(price)
+        }}
+        prefix="Price: $"
+        delimiter=","
+        separator="."
+        precision={2}
+      />
+      </Card>
+      <HelperText type='error' visible= {hasNumErrors(amount)}>
+          please enter only number values
+      </HelperText>
+      {/* <TextInput
         label="Price"
         value={price}
         keyboardType="numeric"
         onChangeText={onChangePrc}
-      />
-      <HelperText type='error' visible= {hasNumErrors(price)}>
-          please enter only valid price
-      </HelperText>
-      <TextInput
-        label="Day"
-        onChangeText={onChangeDay}
-        keyboardType='numeric'
-      />
-      <HelperText type='error' visible= {hasNumErrors(day)}>
-          please enter only number values
-      </HelperText>
-      <TextInput
-        label="Month"
-        onChangeText={onChangeMon}
-        keyboardType='numeric'
-      />
-      <HelperText type='error' visible= {hasNumErrors(month)}>
-      please enter only number values
-      </HelperText>
-      <TextInput
-        label="Year"
-        onChangeText={onChangeYr}
-        keyboardType='numeric'
-      />
-      <HelperText type='error' visible= {hasNumErrors(year)}>
-          please enter only number values
-      </HelperText>
-
+      /> */}
+    <Card style={styles.cardStyle}
+    onPress={() => 
+      showDate()
+    }
+    >
+      <Text style={styles.text}>
+        Date: {day} {pickMonth(month)} {year}
+      </Text>
+    </Card>
+      {show && (
+        <DateTimePicker 
+        mode="date"
+        value={new Date()}
+        onChange={onChange}
+        />
+      )
+      }
     <Button
+    style={styles.cardStyle}
     icon="plus"
     mode="contained"
     onPress={() => insertData()}
@@ -102,8 +143,18 @@ export default function CreateInstance(props) {
 }
 
 const styles = StyleSheet.create({
-  contentView: {
-      flex: 1,
-      flexDirection:'row'
+  cardStyle: {
+    margin:10,
+    padding:12,
+    marginBottom: 29
+  },
+  inputCardStyle: {
+    margin:10,
+    padding:10,
+    marginBottom: 0,
+    marginTop:2
+  },
+  text: {
+    fontSize:15
   }
 });
