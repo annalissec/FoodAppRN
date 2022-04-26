@@ -25,23 +25,23 @@ export default function Waste(props) {
 	  };
 
   useEffect(() => {
-    fetch('http://10.9.184.224:5000/getUsed',{
-        method:'GET'
-    })
-    .then(resp => resp.json())
-    .then(waste => {
-        setData(waste)
-    })
+	fetch('http://10.9.184.224:5000/getUsed',{
+		method:'GET'
+	})
+	.then(resp => resp.json())
+	.then(waste => {
+		setData(waste)
+	})
 }, [])
 
 useEffect(() => {
-    fetch('http://10.9.184.224:5000/getInstance',{
-        method:'GET'
-    })
-    .then(resp => resp.json())
-    .then(instance => {
-        setInstance(instance)
-    })
+	fetch('http://10.9.184.224:5000/getInstance',{
+		method:'GET'
+	})
+	.then(resp => resp.json())
+	.then(instance => {
+		setInstance(instance)
+	})
 }, [])
 
 useEffect(() => {
@@ -50,18 +50,18 @@ useEffect(() => {
 
   const addAmt = (data) => {
 	  var sum = 0
-    for (var obj of data) {
-      sum += obj.amount_used
-    }
-    return sum
+	for (var obj of data) {
+	  sum += obj.amount_used
+	}
+	return sum
   }
 
   const addWaste = (data) => {
 	  var sum = 0
-    for (var obj of data) {
-      sum += obj.instance.amount - obj.amount_used
-    }
-    return sum
+	for (var obj of data) {
+	  sum += obj.instance.amount - obj.amount_used
+	}
+	return sum
   }
 
   var totalWaste = addWaste(data)
@@ -71,14 +71,14 @@ useEffect(() => {
 	  {
 		name: 'Food Wasted',
 		amount: totalWaste,
-		color: "#F00",
+		color: COLORS.pink,
 		legendFontColor: "#7F7F7F",
 		legendFontSize: 12
 	  },
 	  {
 		name: 'Food Used',
 		amount: totalAmt,
-		color: "rgba(131, 167, 234, 1)",
+		color: COLORS.lightGreen,
 		legendFontColor: "#7F7F7F",
 		legendFontSize: 12	  
 	  }
@@ -100,7 +100,7 @@ useEffect(() => {
   
   const tCost = (data) => {
 	  var sum = 0
-    	for (var obj of data) {
+		for (var obj of data) {
 			sum += parseFloat(obj.instance.price)
 	  	}
 	return parseFloat(sum.toFixed(2))
@@ -113,14 +113,14 @@ useEffect(() => {
 	{
 	  name: 'Money Wasted',
 	  cost: wasteCost,
-	  color: "#F00",
+	  color: COLORS.lightRust,
 	  legendFontColor: "#7F7F7F",
 	  legendFontSize: 12
 	},
 	{
 	  name: 'Money Used',
 	  cost: usedCost,
-	  color: "rgba(131, 167, 234, 1)",
+	  color: COLORS.lightBlue,
 	  legendFontColor: "#7F7F7F",
 	  legendFontSize: 12		  
 	}
@@ -139,6 +139,7 @@ useEffect(() => {
 				<Icon
 				name='restaurant-outline'
 				size={40}
+				color={COLORS.rust}
 				/>
 			)}
 		  </View>
@@ -168,7 +169,7 @@ useEffect(() => {
 		/>
 		)}
 
-    </SafeAreaView >
+	</SafeAreaView >
   )
 }
 
@@ -180,12 +181,12 @@ const styles = StyleSheet.create({
 	},
 	headline: {
 		marginTop: 200,
-        fontWeight: 'bold',
-        margin:10,
-        padding:10,
-        fontSize: 20,
-        width: 300,
+		fontWeight: 'bold',
+		margin:10,
+		padding:10,
+		fontSize: 20,
+		width: 300,
 		textAlign: "center",
 		alignSelf: 'center'
-      },
+	  },
 })
