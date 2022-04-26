@@ -17,7 +17,9 @@ function Home(props) {
 	const [sortedData, setSortedData] = useState([])  
 	const [expiredData, setExpiredData] = useState([]) 
 
-	const [show, setShow] = useState(true)
+	const [showNE, setShowNE] = useState(true)
+	const [showE, setShowE] = useState(true)
+	const [showH, setShowH] = useState(true)
 
 
 	useEffect(() => {
@@ -45,7 +47,13 @@ function Home(props) {
 	}, [data, waste])
 
 	useEffect(() => {
-		setShow(data.length == 0)
+		setShowNE(sortedData.length == 0)
+	})
+	useEffect(() => {
+		setShowE(expiredData.length == 0)
+	})
+	useEffect(() => {
+		setShowH(history.length == 0)
 	})
 
 	const pickMonth = (num) => {
@@ -133,8 +141,8 @@ function Home(props) {
 			Not Expired
 		</Text>
 
-		{show && (
-			<Text>
+		{showNE && (
+			<Text style={styles.smallText}>
 				{'\t\t\t\t\t'}No Entries Yet!
 			</Text>
 		)}
@@ -151,6 +159,12 @@ function Home(props) {
 		<Text style={styles.headline}>
 			Expired
 		</Text>
+
+		{showE && (
+			<Text style={styles.smallText}>
+				{'\t\t\t\t\t'}No Entries Yet!
+			</Text>
+		)}
 
 		<FlatList
 			data = {expiredData}
@@ -177,6 +191,11 @@ function Home(props) {
 				Hide History
 			</Text>
 		</View>
+		{showH && (
+			<Text style={styles.smallText}>
+				{'\t\t\t\t\t'}No Entries Yet!
+			</Text>
+		)}
 
 		<FlatList
 			data = {history}
@@ -209,12 +228,17 @@ const styles = StyleSheet.create({
 		bottom:0,
 	},
 	headline: {
-		fontWeight: '400',
+		fontWeight: 'bold',
 		margin:10,
 		padding:10,
-		fontSize: 20,
+		fontSize: 25,
 		width: 200,
+		color: COLORS.darkGrey
 	  },
+	smallText: {
+		fontSize: 15,
+		color: COLORS.pink
+	},
 	checkboxContainer: {
 		flexDirection: "row",
 		alignItems: "center",

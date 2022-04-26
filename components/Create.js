@@ -17,7 +17,10 @@ function Create(props) {
 		body: JSON.stringify({name:name})
 	  })
 	  .then(resp => resp.json())
-	  .then(data => {props.navigation.push('Select')}) 
+	  .then(data => {
+		  if (data)
+		  	props.navigation.push('Select')
+		}) 
 	  .catch(error => console.log(error))
 	}
 	
@@ -29,6 +32,7 @@ function Create(props) {
 			value = {name}
 			mode = "outlined"
 			onChangeText={text => setName(text)}
+			theme={{ colors: { primary: COLORS.darkGreen}}}
 		/>
 		<Button
 			style= {{margin:10}}
@@ -46,7 +50,7 @@ function Create(props) {
 const styles = StyleSheet.create({
 	inputStyle: {
 		margin:10,
-		padding: 15,
+		padding: 10,
 		marginTop: 30,
 	},
   })

@@ -74,7 +74,7 @@ export default function Used(props) {
 				icon='check'
 				onPress={() => insertData()}
 				style={styles.button}
-				color={COLORS.lightBlue}
+				color={COLORS.yellow}
 			>
 				Add Amount Used
 			</Button>

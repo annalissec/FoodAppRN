@@ -7,5 +7,6 @@ export const COLORS = {
 	lightRust: '#b87848',
 	lightBlue: '#b4badb',
 	yellow: '#ede38c',
-	pink: '#fac8d0'
+	pink: '#cf9ba4',
+	darkGrey: '#524d4d'
 }

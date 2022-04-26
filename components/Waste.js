@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { PieChart } from 'react-native-chart-kit'
 
 import {COLORS} from './colors'
+import Legend from './legend'
 
 export default function Waste(props) {
 
@@ -12,6 +13,9 @@ export default function Waste(props) {
 	const [data, setData] = useState([])
 	const [instance, setInstance] = useState([])
 	const [show, setShow] = useState(false)
+
+	const wasteColor = COLORS.lightRust
+	const usedColor = COLORS.lightGreen
 
 	const chartConfig = {
 		backgroundGradientFrom: "#1E2923",
@@ -71,15 +75,15 @@ useEffect(() => {
 	  {
 		name: 'Food Wasted',
 		amount: totalWaste,
-		color: COLORS.pink,
-		legendFontColor: "#7F7F7F",
+		color: wasteColor,
+		legendFontColor:COLORS.darkGrey,
 		legendFontSize: 12
 	  },
 	  {
 		name: 'Food Used',
 		amount: totalAmt,
-		color: COLORS.lightGreen,
-		legendFontColor: "#7F7F7F",
+		color: usedColor,
+		legendFontColor: COLORS.darkGrey,
 		legendFontSize: 12	  
 	  }
   ]
@@ -113,15 +117,15 @@ useEffect(() => {
 	{
 	  name: 'Money Wasted',
 	  cost: wasteCost,
-	  color: COLORS.lightRust,
-	  legendFontColor: "#7F7F7F",
+	  color: wasteColor,
+	  legendFontColor: COLORS.darkGrey,
 	  legendFontSize: 12
 	},
 	{
 	  name: 'Money Used',
 	  cost: usedCost,
-	  color: COLORS.lightBlue,
-	  legendFontColor: "#7F7F7F",
+	  color: usedColor,
+	  legendFontColor: COLORS.darkGrey,
 	  legendFontSize: 12		  
 	}
 ]
@@ -137,38 +141,64 @@ useEffect(() => {
 			)}
 			{ !show && (
 				<Icon
-				name='restaurant-outline'
-				size={40}
-				color={COLORS.rust}
+					name='restaurant-outline'
+					size={40}
+					color={COLORS.rust}
 				/>
 			)}
 		  </View>
 		{show && (
-		<PieChart
-			data={dataPie}
-			width={screenWidth}
-			height={220}
-			chartConfig={chartConfig}
-			accessor={"amount"}
-			backgroundColor={"transparent"}
-			paddingLeft={"15"}
-			center={[10, 10]}
-			absolute
-		/>)}
-		{show && (
-		<PieChart
-			data={dataCost}
-			width={screenWidth}
-			height={220}
-			chartConfig={chartConfig}
-			accessor={"cost"}
-			backgroundColor={"transparent"}
-			paddingLeft={"15"}
-			center={[10, 10]}
-			absolute
-		/>
+			<View style={styles.container}>
+				<PieChart
+					data={dataPie}
+					width={screenWidth}
+					height={220}
+					chartConfig={chartConfig}
+					accessor={"amount"}
+					backgroundColor={"transparent"}
+					paddingLeft={"15"}
+					center={[90, 10]}
+					hasLegend={false}
+			/>
+				<Legend
+					iconColor={wasteColor}
+					legendText={`AMOUNT OF FOOD WASTED: `}
+					number={totalWaste}
+					/>
+				<Legend
+					iconColor={usedColor}
+					legendText={`AMOUNT OF FOOD USED: `}
+					number={totalAmt}
+				/>
+			</View>
 		)}
-
+		{show && (
+			<View style={styles.container}>
+				
+				<PieChart
+					data={dataCost}
+					width={screenWidth}
+					height={220}
+					chartConfig={chartConfig}
+					accessor={"cost"}
+					backgroundColor={"transparent"}
+					paddingLeft={"15"}
+					center={[90, 10]}
+					hasLegend={false}
+				/>
+				<Legend
+					iconColor={wasteColor}
+					legendText={`SPENT ON WASTED FOOD:  $`}
+					number={wasteCost}
+				/>
+				<Legend
+					iconColor={usedColor}
+					legendText={`SPENT ON USED FOOD:  $`}
+					number={usedCost}
+				/>
+			</View>
+		)}
+	
 	</SafeAreaView >
   )
 }
@@ -187,6 +217,7 @@ const styles = StyleSheet.create({
 		fontSize: 20,
 		width: 300,
 		textAlign: "center",
-		alignSelf: 'center'
+		alignSelf: 'center',
+		color: COLORS.darkGrey
 	  },
 })

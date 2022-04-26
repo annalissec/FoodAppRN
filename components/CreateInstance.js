@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native'
-import { Button, Card, HelperText, TextInput } from 'react-native-paper'
+import { Button, Card,  } from 'react-native-paper'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import FakeCurrencyInput from 'react-native-currency-input'
 import React, { useState } from 'react'
