@@ -3,14 +3,12 @@ import { Button, Card, HelperText } from 'react-native-paper'
 import { FakeCurrencyInput } from 'react-native-currency-input'
 import React, {useState} from 'react'
 
+import {COLORS} from './colors'
+
 export default function Used(props) {
 
     const {item} = props.route.params
     const [amount_used, setAmt] = useState('')
-
-    const onChangeAmt = used => {
-      setAmt(used)
-    }
 
     const insertData = () => {
         fetch("http://10.9.184.224:5000/addUsed", {

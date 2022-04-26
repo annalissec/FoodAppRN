@@ -45,7 +45,7 @@ function Select(props) {
         style={styles.fab}
         small={false}
         icon="plus"
-        theme={{colors:{accent:"green"}}}
+        theme={{colors:{accent:"#b1c48f"}}}
         onPress = {() => props.navigation.navigate('Create')}
         />
     </View>

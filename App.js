@@ -9,6 +9,8 @@ import Waste from './components/Waste'
 
 import Tabs from './components/TabNavigator'
 
+import {COLORS} from './components/colors'
+
 import Contants from 'expo-constants'
 
 import { createStackNavigator } from '@react-navigation/stack'
@@ -25,31 +27,38 @@ function HomeStack(){
 function App() {
 
   return (
-    <View style={styles.container}>
-      <Stack.Navigator>
-        <Stack.Screen name ="Home" options={{title: "Items"}} component={HomeStack}/>
-        <Stack.Screen name ="Create" options={{title: "Add New Food"}} component={Create}/>
-        <Stack.Screen name ="Select" options={{title: "Select Food Type"}} component={Select}/>
-        <Stack.Screen name ="Used" options={{title: "Enter Amount Used"}} component={Used}/>
-        <Stack.Screen name ="CreateInstance" options={{title: "Add New Food"}} component={CreateInstance}/>
-        <Stack.Screen name ="Waste" options={{title: "Waste Data"}} component={Waste}/>
-      </Stack.Navigator>
-    </View>
+	<View style={styles.container}>
+		<Stack.Navigator>
+			<Stack.Screen name ="Home" options={{
+				title: "Items",
+				headerStyle: {
+					backgroundColor: COLORS.topBar,
+				  },
+				headerTintColor: COLORS.darkGreen,
+			}} 
+				component={HomeStack}/>
+			<Stack.Screen name ="Create" options={{title: "Add New Food"}} component={Create}/>
+			<Stack.Screen name ="Select" options={{title: "Select Food Type"}} component={Select}/>
+			<Stack.Screen name ="Used" options={{title: "Enter Amount Used"}} component={Used}/>
+			<Stack.Screen name ="CreateInstance" options={{title: "Add New Food"}} component={CreateInstance}/>
+			<Stack.Screen name ="Waste" options={{title: "Waste Data"}} component={Waste}/>
+		</Stack.Navigator>
+	</View>
   );
 }
 
 export default() => {
   return(
-    <NavigationContainer>
-      <App/>
-    </NavigationContainer>
+	<NavigationContainer>
+		<App/>
+	</NavigationContainer>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#eddfdf',
+    backgroundColor: COLORS.background,
     marginTop:Contants.statusBarHeight
   },
 });

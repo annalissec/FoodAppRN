@@ -1,8 +1,9 @@
-import { Dimensions, SafeAreaView  } from 'react-native'
+import { Dimensions, SafeAreaView, View, Text, StyleSheet  } from 'react-native'
+import Icon from 'react-native-vector-icons/Ionicons'
 import React, { useEffect, useState } from 'react'
 import { PieChart } from 'react-native-chart-kit'
 
-
+import {COLORS} from './colors'
 
 export default function Waste(props) {
 
@@ -10,6 +11,7 @@ export default function Waste(props) {
 
 	const [data, setData] = useState([])
 	const [instance, setInstance] = useState([])
+	const [show, setShow] = useState(false)
 
 	const chartConfig = {
 		backgroundGradientFrom: "#1E2923",
@@ -41,6 +43,10 @@ useEffect(() => {
         setInstance(instance)
     })
 }, [])
+
+useEffect(() => {
+	setShow(data.length != 0)
+})
 
   const addAmt = (data) => {
 	  var sum = 0
@@ -121,29 +127,65 @@ useEffect(() => {
 ]
 
   return (
-    <SafeAreaView>
-      <PieChart
-        data={dataPie}
-        width={screenWidth}
-        height={220}
-        chartConfig={chartConfig}
-        accessor={"amount"}
-        backgroundColor={"transparent"}
-        paddingLeft={"15"}
-        center={[10, 10]}
-        absolute
-      />
-	  <PieChart
-		data={dataCost}
-		width={screenWidth}
-		height={220}
-		chartConfig={chartConfig}
-		accessor={"cost"}
-		backgroundColor={"transparent"}
-		paddingLeft={"15"}
-		center={[10, 10]}
-		absolute
-	  />
+  	<SafeAreaView>
+		  <View style={styles.container}>
+			{ !show && (
+				<Text style={styles.headline}>
+					No Waste Data Entered Yet!
+				</Text>
+				
+			)}
+			{ !show && (
+				<Icon
+				name='restaurant-outline'
+				size={40}
+				/>
+			)}
+		  </View>
+		{show && (
+		<PieChart
+			data={dataPie}
+			width={screenWidth}
+			height={220}
+			chartConfig={chartConfig}
+			accessor={"amount"}
+			backgroundColor={"transparent"}
+			paddingLeft={"15"}
+			center={[10, 10]}
+			absolute
+		/>)}
+		{show && (
+		<PieChart
+			data={dataCost}
+			width={screenWidth}
+			height={220}
+			chartConfig={chartConfig}
+			accessor={"cost"}
+			backgroundColor={"transparent"}
+			paddingLeft={"15"}
+			center={[10, 10]}
+			absolute
+		/>
+		)}
+
     </SafeAreaView >
   )
 }
+
+const styles = StyleSheet.create({
+	container: {
+		justifyContent: "center",
+		alignItems: "center",
+		
+	},
+	headline: {
+		marginTop: 200,
+        fontWeight: 'bold',
+        margin:10,
+        padding:10,
+        fontSize: 20,
+        width: 300,
+		textAlign: "center",
+		alignSelf: 'center'
+      },
+})

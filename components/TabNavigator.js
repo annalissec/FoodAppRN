@@ -1,14 +1,18 @@
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import Icon from 'react-native-vector-icons/Ionicons';
 
-import Home from "./Home";
-import Waste from "./Waste";
+import Home from "./Home"
+import Waste from "./Waste"
+
+import {COLORS} from './colors'
 
 const Tab = createMaterialBottomTabNavigator()
 
 const Tabs = () => {
     return (
-        <Tab.Navigator>
+        <Tab.Navigator
+        barStyle={{ backgroundColor:COLORS.darkGreen}}
+        >
             <Tab.Screen name="Home" component={Home} options={{
                     tabBarlabel: 'Home',
                     tabBarColor: '#009387',

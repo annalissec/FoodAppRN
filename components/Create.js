@@ -2,6 +2,8 @@ import React, {useState} from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import {Button, TextInput} from 'react-native-paper'
 
+import {COLORS} from './colors'
+
 function Create(props) {
 
     const [name, setName] = useState("")
@@ -33,6 +35,7 @@ function Create(props) {
         icon = "pencil"
         mode = "contained"
         onPress={() => insertData()}
+        // color={COLORS.lightGreen}
         >Submit New Food</Button>
     </View>
   )

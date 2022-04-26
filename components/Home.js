@@ -3,12 +3,13 @@ import React, {useState, useEffect} from 'react'
 import {View, Text, FlatList, StyleSheet} from 'react-native'
 import { FAB, Button, List, Checkbox } from 'react-native-paper'
 
+import {COLORS} from './colors'
+
 function Home(props) {
 
     const [checked, setChecked] = React.useState(false);
 
     const [data, setData] = useState([]) 
-    
     const [waste, setWaste] = useState([])
     
     const [history, setHistory] = useState([])
@@ -16,12 +17,16 @@ function Home(props) {
     const [sortedData, setSortedData] = useState([])  
     const [expiredData, setExpiredData] = useState([]) 
 
+	const [show, setShow] = useState(true)
+
+
     useEffect(() => {
         fetch('http://10.9.184.224:5000/getInstance',{
             method:'GET'
         })
         .then(resp => resp.json())
         .then(instance => {
+			console.log(instance)
             setData(instance)
         })
     }, [])
@@ -40,6 +45,10 @@ function Home(props) {
         sortData(data, waste)
     }, [data, waste])
 
+	useEffect(() => {
+		setShow(data.length == 0)
+	})
+
     const pickMonth = (num) => {
         var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
         return months[num-1]
@@ -55,21 +64,27 @@ function Home(props) {
         var temp = []
         var expired = []
         var used = []
+
         let today = new Date().toISOString().slice(0, 10)
+
         for (var obj of data ) {
             if (waste.some((item) => item.instance.instance_id === obj.instance_id )) {
                 used.push(waste.find(item => {return item.instance.instance_id === obj.instance_id}))
             }
+
             else if (obj.date != null && today <= obj.date) {
                 temp.push(obj)
             } 
+
             else {
                 expired.push(obj)
             }
         }
+
         temp.sort(function(a, b) {return new Date(a.date) - new Date(b.date)})
         expired.sort(function(a, b) {return -1*(new Date(a.date) - new Date(b.date))})
         used.sort(function(a, b) {return new Date(a.date) - new Date(b.date)})
+
         setExpiredData(expired)
         setSortedData(temp)
         setHistory(used)
@@ -77,106 +92,113 @@ function Home(props) {
 
     const renderData = (item) => {
         return (
-                <List.Accordion
-                title={`${toTitleCase(item.food.name)}`}
-                >
-                    <List.Item title={`     Quantity: ${item.amount}`}/>
-                    <List.Item title={`     Expiring: ${item.day} ${pickMonth(item.month)} ${item.year}`}/>
-                    <Button
-                    mode="contained"
-                    icon="check"
-                    onPress={() => props.navigation.navigate("Used", {
-                        item:item
-                    })}
-                    >
-                        Did you use this item?
-                    </Button>
-                
-                </List.Accordion>
+			<List.Accordion
+				title={`${toTitleCase(item.food.name)}`}
+			>
+				<List.Item title={`     Quantity: ${item.amount}`}/>
+
+				<List.Item title={`     Expiring: ${item.day} ${pickMonth(item.month)} ${item.year}`}/>
+
+				<Button
+					mode="contained"
+					icon="check"
+					onPress={() => props.navigation.navigate("Used", {
+						item:item
+					})}
+				>
+					Did you use this item?
+				</Button>
+			</List.Accordion>
         )
     }
 
     const renderHistory = (item) => {
         return (
-                <List.Accordion
-                title={`${toTitleCase(item.instance.food.name)}`}
-                >
-                    <List.Item title={`     Quantity Used: ${item.amount_used}`}/>
-                    <List.Item title={`     Quantity: ${item.instance.amount}`}/>
-                </List.Accordion>
+			<List.Accordion
+				title={`${toTitleCase(item.instance.food.name)}`}
+			>
+				<List.Item title={`     Quantity Used: ${item.amount_used}`}/>
+				<List.Item title={`     Quantity: ${item.instance.amount}`}/>
+			</List.Accordion>
         )
     }
 
   return (
-    <View style={{flex:1}}>
+	<View style={{flex:1}}>
 
-    <Text style={styles.headline}>
-        Not Expired
-    </Text>
-        <FlatList
-        data = {sortedData}
-        extraData = {sortedData}
-        renderItem = {({item}) => {
-            return renderData(item)
-        }}
-        keyExtractor = {item => `${item.instance_id}`}
-        />
+		<Text style={styles.headline}>
+			Not Expired
+		</Text>
 
-    <Text style={styles.headline}>
-        Expired
-    </Text>
+		{show && (
+			<Text>
+				{'\t\t\t\t\t'}No Entries Yet!
+			</Text>
+		)}
 
         <FlatList
-        data = {expiredData}
-        extraData = {expiredData}
-        renderItem = {({item}) => {
-            return renderData(item)
-        }}
-        keyExtractor = {item => `${item.instance_id}`}
+			data = {sortedData}
+			extraData = {sortedData}
+			renderItem = {({item}) => {
+				return renderData(item)
+			}}
+			keyExtractor = {item => `${item.instance_id}`}
         />
-    <View  style={styles.checkboxContainer}>
-    <Text style={styles.headline}>
-        History
-    </Text>
-    <Checkbox
-    status={checked ? 'checked' : 'unchecked'}
-    onPress={() => {
-        console.log(!checked)
-        setChecked(!checked)
-    }}
-    />
-    <Text >
-        Hide History
-    </Text>
-    </View>
 
-    <FlatList
-        data = {history}
-        extraData = {history}
-        renderItem = {({item}) => {
-            if (!checked){
-                return renderHistory(item)
-            }
-        }}
-        keyExtractor = {item => `${item.instance.instance_id}`}
+		<Text style={styles.headline}>
+			Expired
+		</Text>
+
+        <FlatList
+			data = {expiredData}
+			extraData = {expiredData}
+			renderItem = {({item}) => {
+				return renderData(item)
+			}}
+			keyExtractor = {item => `${item.instance_id}`}
         />
+		<View  style={styles.checkboxContainer}>
+			<Text style={styles.headline}>
+				History
+			</Text>
+
+			<Checkbox
+				status={checked ? 'checked' : 'unchecked'}
+				onPress={() => {
+					setChecked(!checked)
+				}}
+				color={COLORS.darkGreen}
+			/>
+
+			<Text >
+				Hide History
+			</Text>
+		</View>
+
+		<FlatList
+			data = {history}
+			extraData = {history}
+			renderItem = {({item}) => {
+				if (!checked){
+					return renderHistory(item)
+				}
+			}}
+			keyExtractor = {item => `${item.instance.instance_id}`}
+		/>
 
         <FAB
-        style={styles.fab}
-        small={false}
-        icon="plus"
-        theme={{colors:{accent:"green"}}}
-        onPress = {() => props.navigation.navigate('Select')}
+			style={styles.fab}
+			small={false}
+			icon="plus"
+			theme={{colors:{accent:COLORS.lightGreen}}}
+			onPress = {() => props.navigation.navigate('Select')}
         />
+
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-    cardStyle: {
-      margin:10,
-      padding:10
-    },
     fab: {
         position:'absolute',
         margin:20,

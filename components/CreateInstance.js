@@ -4,6 +4,8 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import FakeCurrencyInput from 'react-native-currency-input'
 import React, { useState } from 'react'
 
+
+
 export default function CreateInstance(props) {
 
     const {foodName, food_id, foods} = props.route.params
