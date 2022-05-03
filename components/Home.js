@@ -1,11 +1,26 @@
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useRef} from 'react'
 import {View, Text, FlatList, StyleSheet} from 'react-native'
 import { FAB, Button, List, Checkbox } from 'react-native-paper'
+import * as Notifications from 'expo-notifications'
+import Constants from 'expo-constants'
+
+Notifications.setNotificationHandler({
+	handleNotification: async () => ({
+		shouldShowAlert: true,
+		shouldPlaySound: false,
+		shouldSetBadge: true,
+	})
+})
 
 import {COLORS} from './colors'
 
-function Home(props) {
+export default function Home(props) {
+
+	const [expoPushToken, setExpoPushToken] = useState('')
+	const [notification, setNotification] = useState(false)
+	const notificationListener = useRef()
+	const responseListener = useRef()
 
 	const [checked, setChecked] = React.useState(false);
 
@@ -17,10 +32,28 @@ function Home(props) {
 	const [sortedData, setSortedData] = useState([])  
 	const [expiredData, setExpiredData] = useState([]) 
 
+	const [notifData, setNotifData] = useState([])
+
 	const [showNE, setShowNE] = useState(true)
 	const [showE, setShowE] = useState(true)
 	const [showH, setShowH] = useState(true)
 
+	useEffect(() => {
+		registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+	
+		notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+		  setNotification(notification);
+		});
+	
+		responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+		  console.log(response);
+		});
+	
+		return () => {
+		  Notifications.removeNotificationSubscription(notificationListener.current);
+		  Notifications.removeNotificationSubscription(responseListener.current);
+		};
+	  }, [])
 
 	useEffect(() => {
 		fetch('http://10.9.184.224:5000/getInstance',{
@@ -28,6 +61,7 @@ function Home(props) {
 		})
 		.then(resp => resp.json())
 		.then(instance => {
+			//console.log(instance)
 			setData(instance)
 		})
 	}, [])
@@ -49,12 +83,30 @@ function Home(props) {
 	useEffect(() => {
 		setShowNE(sortedData.length == 0)
 	})
+
 	useEffect(() => {
 		setShowE(expiredData.length == 0)
 	})
+
 	useEffect(() => {
 		setShowH(history.length == 0)
 	})
+
+	useEffect(() => {
+		let arr = []
+		for (let item of sortedData) {
+			if (reminder(item)) {
+				arr.push(item)
+			}
+		}
+		if (arr.length != 0){
+			setNotifData(arr)
+		}
+	}, [showNE])
+
+	useEffect(() => {
+		scheduleNotifs(notifData)
+	}, [notifData])
 
 	const pickMonth = (num) => {
 		var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -66,6 +118,19 @@ function Home(props) {
 			return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
 		});
 	} 
+
+	function reminder(item) {
+		let currDate = new Date()
+		let tempDate = new Date()
+		let approachingDate = new Date(tempDate.setDate(tempDate.getDate() + 5))
+		let itemDate = new Date(item.year, item.month -1, item.day)
+
+		approachingDate.setHours(0, 0, 0, 0)
+		itemDate.setHours(0, 0, 0, 0)
+		currDate.setHours(0, 0, 0, 0)
+
+		return (itemDate.getTime() === approachingDate.getTime()) || (itemDate.getTime() < approachingDate.getTime() && itemDate.getTime() >= currDate.getTime())
+	}
 
 	function sortData(data, waste) {
 		var temp = []
@@ -97,10 +162,20 @@ function Home(props) {
 		setHistory(used)
 	}
 
+	const getColor = (item) => {
+		if (reminder(item)){
+			return COLORS.lightRust
+		}
+		else {
+			return COLORS.darkGrey
+		}
+	}
+
 	const renderData = (item) => {
 		return (
 			<List.Accordion
 				title={`${toTitleCase(item.food.name)}`}
+				titleStyle={{color: getColor(item)}}
 				theme={{ colors: { primary: COLORS.lightBlue }}}
 			>
 				<List.Item title={`     Quantity: ${item.amount}`}/>
@@ -132,6 +207,61 @@ function Home(props) {
 				<List.Item title={`     Quantity: ${item.instance.amount}`}/>
 			</List.Accordion>
 		)
+	}
+
+	const scheduleNotifs = async(notifData) => {
+		let str = ""
+		let opt1 = " are expiring soon!"
+		let opt2 = " is expiring soon!"
+		await Notifications.cancelAllScheduledNotificationsAsync();
+		for (let item of notifData) {
+			if (item == notifData[0]) {
+				str += toTitleCase(item.food.name) 
+			} 
+
+			else if (notifData.length == 2) {
+				str += " and "
+				str += toTitleCase(item.food.name)
+			}
+
+			else if (notifData.length > 2 && item == notifData[notifData.length-1]) {
+				str += ", and "
+				str += toTitleCase(item.food.name) 
+			}
+			
+			else {
+				str += ", "
+				str += toTitleCase(item.food.name) 
+			}
+		}
+
+		if (notifData.length > 1) {
+			str += opt1
+		} else {
+			str += opt2
+		}
+
+		await Notifications.scheduleNotificationAsync({
+			identifier: "Food Notif",
+			content: {
+				title: "You have items expiring within the next five days!",
+				body: `${str}`,
+				color: "#ffffff",
+				data: {
+					to: 'new-log'
+				}
+			},
+			//TODO: fix trigger
+			trigger: {
+				hour: 13,
+				minute: 46,
+				//seconds: 1,
+				repeats: true
+			}
+		})
+
+		let test = Notifications.getAllScheduledNotificationsAsync()
+		//console.log(test)
 	}
 
   return (
@@ -219,7 +349,6 @@ function Home(props) {
 	</View>
   )
 }
-
 const styles = StyleSheet.create({
 	fab: {
 		position:'absolute',
@@ -248,4 +377,31 @@ const styles = StyleSheet.create({
 	}
   });
 
-export default Home
+  async function registerForPushNotificationsAsync() {
+	let token;
+	try {
+		const { status: existingStatus } = await Notifications.getPermissionsAsync()
+		let finalStatus = existingStatus
+		if (existingStatus !== 'granted') {
+		  const { status } = await Notifications.requestPermissionsAsync()
+		  finalStatus = status
+		}
+		if (finalStatus !== 'granted') {
+		  throw new Error('Permission not granted!')
+		}
+		const token = (await Notifications.getExpoPushTokenAsync()).data
+		return token
+	  } catch (error) {
+		console.error(error)
+	  }
+  
+	if (Platform.OS === 'android') {
+	  Notifications.setNotificationChannelAsync('default', {
+		name: 'default',
+		importance: Notifications.AndroidImportance.MAX,
+		vibrationPattern: [0, 250, 250, 250],
+		lightColor: '#FF231F7C',
+	  });
+	}
+}
+

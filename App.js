@@ -7,6 +7,7 @@ import CreateInstance from './components/CreateInstance'
 import Used from './components/Used'
 import Waste from './components/Waste'
 import Home from './components/Home'
+import Barcode from './components/barcode'
 
 import {COLORS} from './components/colors'
 
@@ -26,7 +27,13 @@ const Tab = createMaterialBottomTabNavigator()
 function HomeTabs(){
   return(
 	<Tab.Navigator
-	barStyle={{ backgroundColor:COLORS.darkGreen}}
+	barStyle={{ 
+		backgroundColor:COLORS.darkGreen,
+		// borderTopLeftRadius:15,
+		// borderTopRightRadius:15,
+		// height:50
+	
+	}}
 	>
 		<Tab.Screen name="Home" component={Home} options={{
 				tabBarlabel: 'Home',
@@ -47,30 +54,6 @@ function HomeTabs(){
   )
 }
 
-function WasteTabs(){
-	return(
-	  <Tab.Navigator
-	  barStyle={{ backgroundColor:COLORS.darkGreen}}
-	  >
-		  <Tab.Screen name="Home" component={Home} options={{
-				  tabBarlabel: 'Home',
-				  tabBarColor: '#009387',
-				  tabBarIcon: ({color}) => (
-					  <Icon name='home' color={color} size={26}/>
-				  )
-			  }}
-		  />
-		  <Tab.Screen name="Waste" component={Waste} options={{
-				  	tabBarlabel: 'Waste',
-				  	tabBarColor: '#1f65ff',
-				  	tabBarIcon: ({color}) => (
-					  <Icon name='trash' color={color} size={26}/>
-				  )
-			  }}/>
-	  </Tab.Navigator>
-	)
-  }
-
 function App() {
 
   return (
@@ -88,7 +71,8 @@ function App() {
 			<Stack.Screen name ="Select" options={{title: "Select Food Type"}} component={Select}/>
 			<Stack.Screen name ="Used" options={{title: "Enter Amount Used"}} component={Used}/>
 			<Stack.Screen name ="CreateInstance" options={{title: "Add New Food"}} component={CreateInstance}/>
-			<Stack.Screen name ="Waste" options={{title: "Waste Data"}} component={WasteTabs}/>
+			<Stack.Screen name ="Waste" options={{title: "Waste Data"}} component={Waste}/>
+			<Stack.Screen name ="Barcode" options={{title: "Barcode"}} component={Barcode}/>
 		</Stack.Navigator>
 	</View>
   );

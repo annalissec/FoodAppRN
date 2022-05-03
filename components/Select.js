@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import { View, StyleSheet, FlatList } from 'react-native'
+import { View, StyleSheet, FlatList, Alert, TextComponent } from 'react-native'
 import { Button, FAB, Text } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/Ionicons'
 
@@ -8,6 +8,7 @@ import {COLORS} from './colors'
 function Select(props) {
 
 	const [data, setData] = useState([])
+	const [tempData, setTempData] = useState([])
 	const [show, setShow] = useState(false)
 
 	useEffect(() => {
@@ -17,12 +18,30 @@ function Select(props) {
 		.then(resp => resp.json())
 		.then(food => {
 			setData(food)
+			setTempData(food)
 		})
 	}, [])
 
 	useEffect(() => {
 		setShow(data.length == 0)
 	})
+
+	const createTwoButtonAlert = (item) =>
+    Alert.alert(
+      "Delete Food?",
+      `Would you like to delete ${item.name}?`,
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => {
+			const filteredData = tempData.filter(listItem => listItem.food_id !== item.food_id)
+			setTempData(filteredData)
+		}}
+      ]
+    )
 
 	const renderData = (item) => {
 		return(
@@ -45,8 +64,8 @@ function Select(props) {
 			</Button>
 			<Icon
 				name="information-circle-outline"
-				onPress={()=>{
-					console.log('pressed')
+				onPress={() =>{
+					createTwoButtonAlert(item)
 				}}
 				size={25}
 				color={COLORS.lightRust}
@@ -71,11 +90,19 @@ function Select(props) {
 			)}
 
 		<FlatList
-		data = {data}
+		data = {tempData}
 		renderItem = {({item}) => {
 			return renderData(item)
 		}}
-		keyExtractor = {item => `${item.food_id}`}
+		keyExtractor = {item => item.food_id}
+		/>
+		
+		<FAB
+			style={styles.fab1}
+			small={false}
+			icon="camera"
+			theme={{colors:{accent:COLORS.lightBlue}}}
+			onPress = {() => props.navigation.navigate('Barcode')}
 		/>
 
 		<FAB
@@ -83,7 +110,9 @@ function Select(props) {
 		small={false}
 		icon="plus"
 		theme={{colors:{accent:"#b1c48f"}}}
-		onPress = {() => props.navigation.navigate('Create')}
+		onPress = {() => props.navigation.push('Create', {
+			foodName: null
+		})}
 		/>
 	</View>
   )
@@ -110,6 +139,12 @@ const styles = StyleSheet.create({
 		position:'absolute',
 		margin:16,
 		right:0,
+		bottom:0,
+	},
+	fab1: {
+		position:'absolute',
+		margin:20,
+		left:0,
 		bottom:0,
 	},
 	headline: {

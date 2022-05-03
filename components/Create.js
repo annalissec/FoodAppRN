@@ -1,10 +1,12 @@
-import React, {useState} from 'react'
-import { View, StyleSheet } from 'react-native'
+import React, {useState, useEffect} from 'react'
+import { View, StyleSheet, } from 'react-native'
 import {Button, TextInput} from 'react-native-paper'
 
 import {COLORS} from './colors'
 
 function Create(props) {
+
+	const {foodName} = props.route.params
 
 	const [name, setName] = useState("")
 
@@ -29,7 +31,7 @@ function Create(props) {
 	<View>
 		<TextInput style = {styles.inputStyle}
 			label = "Name"
-			value = {name}
+			value = {foodName != null ? foodName : name}
 			mode = "outlined"
 			onChangeText={text => setName(text)}
 			theme={{ colors: { primary: COLORS.darkGreen}}}
